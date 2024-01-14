@@ -28,6 +28,7 @@ function Side(props) {
   const [selected, SetSelected] = useState("");
   const [groups, setGroups] = useState([]);
   const navigate = useNavigate();
+  const { setGrpId } = useContext(ThemeContext);
 
   // const updatedFriends = [];
   console.log("current id users id");
@@ -145,7 +146,7 @@ function Side(props) {
     console.log(name, "from the side js");
   };
 
-  const groupChats = () => {
+  const groupChats = (grpId, grpName, grpDp) => {
     setRequests([
       {
         empty: false,
@@ -154,6 +155,7 @@ function Side(props) {
         groups: true,
       },
     ]);
+    setGrpId(grpId);
   };
   const clubs = async (cur_id) => {
     console.log("came to clubs da");
@@ -228,8 +230,13 @@ function Side(props) {
           <ul>
             {groups.map((grp) => (
               <div>
-                {grp.Status === "ACCEPTED" && (
-                  <li className="groups" onClick={groupChats()}>
+                {(grp.Status === "ACCEPTED" || grp.Status === "CREATOR") && (
+                  <li
+                    className="groups"
+                    onClick={() =>
+                      groupChats(grp.groupId, grp.group_name, grp.group_dp)
+                    }
+                  >
                     <img
                       src={`http://localhost:8000/images/${grp.group_dp}`}
                       className="groupDp"

@@ -156,9 +156,11 @@ function CreateGroups() {
                         // userNames: userNames,
                       }
                     );
-                    if (secondres == "ok") {
+                    if (secondres === "ok") {
                       console.log("go");
-                      navigate("/home");
+                      navigate("/home", {
+                        state: { receivedId: cur_id, presentName: pName },
+                      });
                     }
                   } catch (err) {
                     console.log(err);

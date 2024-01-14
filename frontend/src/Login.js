@@ -46,7 +46,7 @@ function Login() {
         console.log(email);
         console.log("this is id");
         console.log(userId);
-        navigate("/Home", { state: { email, receivedId, presentName } });
+        navigate("/Home", { state: { receivedId, presentName } });
         // navigate("/selectDp");
         setLoggedIn(true);
       }

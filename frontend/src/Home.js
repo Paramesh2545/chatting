@@ -12,7 +12,7 @@ import Groups from "./Groups";
 function Home() {
   // const location = useLocation();
   const { state } = useLocation();
-  console.log(state.email);
+  // console.log(state.email);
   console.log(state.receivedId);
   const id = state.receivedId;
   const pName = state.presentName;
@@ -32,7 +32,7 @@ function Home() {
       } else if (request[0].messegaes) {
         return <Message id={id} />;
       } else if (request[0].groups) {
-        return <Groups />;
+        return <Groups id={id} />;
       }
     }
 

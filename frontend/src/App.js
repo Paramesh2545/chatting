@@ -20,6 +20,7 @@ function App() {
   ]);
   const [frdId, setFrdId] = useState("");
   const [frdName, setFrdName] = useState("");
+  const [grpId, setGrpId] = useState("");
   return (
     <ThemeContext.Provider
       value={{
@@ -31,6 +32,8 @@ function App() {
         setFrdId,
         frdName,
         setFrdName,
+        grpId,
+        setGrpId,
       }}
     >
       <BrowserRouter>

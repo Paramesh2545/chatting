@@ -673,6 +673,7 @@ app.post("/addgroupmembers", (req, res) => {
           }
         );
       }
+      console.log("ok");
       res.status(200).json("ok");
       // connection.query(
       //   secondsql,
@@ -740,6 +741,31 @@ app.post("/rejectGroupRequest", (req, res) => {
         return res.status(500).json(err);
       }
       return res.status(200).json("ok");
+    });
+  });
+});
+
+app.post("/getGroups", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    console.log("came to get groups");
+    const grpId = req.body.grpId;
+    const pId = req.body.pId;
+    const sql = `select * from clubs 
+    inner join group_messages
+    on group_messages.group_id=clubs.groupId
+    inner join club_members
+    on group_messages.group_id=club_members.club_id and club_members.memberId=?
+    where groupId=?`;
+    connection.query(sql, [pId, grpId], (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      return res.status(200).json(data);
     });
   });
 });
