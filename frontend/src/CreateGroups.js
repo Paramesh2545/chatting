@@ -156,12 +156,12 @@ function CreateGroups() {
                         // userNames: userNames,
                       }
                     );
-                    if (secondres === "ok") {
-                      console.log("go");
-                      navigate("/home", {
-                        state: { receivedId: cur_id, presentName: pName },
-                      });
-                    }
+                    // if (secondres.data === "ok") {
+                    console.log("go");
+                    navigate("/home", {
+                      state: { receivedId: cur_id, presentName: pName },
+                    });
+                    // }
                   } catch (err) {
                     console.log(err);
                   }

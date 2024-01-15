@@ -424,6 +424,30 @@ app.post("/sendFile", upload.single("file"), (req, res) => {
   });
 });
 
+app.post("/sendFileGrp", upload.single("file"), (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json("error in connection to data");
+    }
+    const { pId, grpId } = req.body;
+    // if (FormData.has("file")) {
+    const file = req.file.filename;
+    console.log(file);
+    console.log(file.filename, "this is file name ");
+    const sql = `insert into group_messages (group_id,user_id,file) values(${grpId},${pId},"${file}");`;
+    connection.query(sql, (err, data) => {
+      connection.release();
+      if (err) {
+        console.log(err);
+        return res.status(500).json("error in sending query");
+      }
+      console.log("executed to connection.query");
+      return res.status(200).json("success");
+    });
+  });
+});
+
 app.post("/sendmessage", (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) {
@@ -434,6 +458,28 @@ app.post("/sendmessage", (req, res) => {
     const friend = req.body.friend;
     const pid = req.body.pid;
     const sql = `insert into chats (fromId,toId,msg,at_date,at_time) values(${pid},${friend},'${messages}',current_date(),current_time())`;
+    connection.query(sql, (err, data) => {
+      connection.release();
+      if (err) {
+        console.log(err);
+        res.status(500).json(err);
+      }
+      console.log("inserted the message");
+      res.status(200).json(data);
+    });
+  });
+});
+
+app.post("/sendGrpMessage", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const messages = req.body.messages;
+    const grpId = req.body.grpId;
+    const pId = req.body.pId;
+    const sql = `insert into group_messages (group_id,user_id,message_text) values(${grpId},${pId},"${messages}");`;
     connection.query(sql, (err, data) => {
       connection.release();
       if (err) {
@@ -473,7 +519,7 @@ app.post("/getClubs", (req, res) => {
     }
     const id = req.body.cur_id;
     // console.log(id);
-    const sql = `select * from club_members join clubs on groupId=club_id where memberId=${id}`;
+    const sql = `select distinct * from club_members join clubs on groupId=club_id where memberId=${id}`;
     connection.query(sql, (err, data) => {
       connection.release();
       // console.log("came to clubs");
@@ -495,6 +541,25 @@ app.post("/delmsg", (req, res) => {
     }
     const msgId = req.body.msgId;
     const sql = `delete from chats where msgId=?`;
+    conection.query(sql, msgId, (err, data) => {
+      conection.release();
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      return res.status(200).json("success");
+    });
+  });
+});
+
+app.post("/delGrpMsg", (req, res) => {
+  pool.getConnection((err, conection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const msgId = req.body.msgId;
+    const sql = `delete from group_messages where msgId=?`;
     conection.query(sql, msgId, (err, data) => {
       conection.release();
       if (err) {
@@ -754,17 +819,38 @@ app.post("/getGroups", (req, res) => {
     console.log("came to get groups");
     const grpId = req.body.grpId;
     const pId = req.body.pId;
-    const sql = `select * from clubs 
-    inner join group_messages
-    on group_messages.group_id=clubs.groupId
+    const sql = `select distinct * from clubs 
     inner join club_members
-    on group_messages.group_id=club_members.club_id and club_members.memberId=?
+    on clubs.groupId=club_members.club_id and club_members.memberId=?
     where groupId=?`;
     connection.query(sql, [pId, grpId], (err, data) => {
       if (err) {
         console.log(err);
         return res.status(500).json(err);
       }
+      console.log(data);
+      return res.status(200).json(data);
+    });
+  });
+});
+
+app.post("/getGroupMes", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const grpId = req.body.grpId;
+    const sql = `SELECT * FROM group_messages
+    inner join users
+    on users.user_id=group_messages.user_id
+    where group_messages.group_id=?`;
+    connection.query(sql, [grpId], (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      console.log(data, "came to groups message");
       return res.status(200).json(data);
     });
   });

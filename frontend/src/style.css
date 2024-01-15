@@ -276,4 +276,9 @@ text {
 }
 .upnavbar {
   background-color: #8df488;
+  height: 40px;
+  border-radius: 15px;
+}
+.mainGroups {
+  min-height: 100vh;
 }
