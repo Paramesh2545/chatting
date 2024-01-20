@@ -17,7 +17,9 @@ function Groups(props) {
   const [grpMessages, setGrpMessages] = useState([]);
   const [file, setFile] = useState(null);
   const [enteredMessage, setEnteredMessage] = useState("");
-
+  const [edit, setEdit] = useState(true);
+  const [search, setSearch] = useState("");
+  const [searchToggle, setSearchToggle] = useState(false);
   useEffect(() => {
     const getGroup = async () => {
       try {
@@ -101,6 +103,14 @@ function Groups(props) {
     getMes(grpId);
   };
 
+  const searchTog = (e) => {
+    setSearch(e.target.value);
+    if (search.length > 1) {
+      setSearchToggle(true);
+    } else {
+      setSearchToggle(false);
+    }
+  };
   const delMessage = async (msgId) => {
     try {
       const res = await axios.post("http://localhost:8000/delGrpMsg", {
@@ -130,67 +140,83 @@ function Groups(props) {
           </div>
         ))}
       </div>
-      <div className="messages">
-        {fromattedData.map((mes) => (
-          <div className="prevent">
-            {mes.user_id === pId && (
-              <div className="sended">
-                <div className="del" onClick={() => delMessage(mes.msgId)}>
-                  <MdDelete />
-                </div>
-                <div className="message">
-                  {mes.files && (
-                    <img
-                      src={`http://localhost:8000/images/${mes.files}`}
-                    ></img>
-                  )}
-                  <h6> {mes.message_text}</h6>
-                  <p>{mes.date}</p>
-                  <p>{mes.time}</p>
-                </div>
-                <img src={`http://localhost:8000/images/${mes.dp}`}></img>
+      {!edit && (
+        <div>
+          <div className="messages">
+            {fromattedData.map((mes) => (
+              <div className="prevent">
+                {mes.user_id === pId && (
+                  <div className="sended">
+                    <div className="del" onClick={() => delMessage(mes.msgId)}>
+                      <MdDelete />
+                    </div>
+                    <div className="message">
+                      {mes.files && (
+                        <img
+                          src={`http://localhost:8000/images/${mes.files}`}
+                        ></img>
+                      )}
+                      <h6> {mes.message_text}</h6>
+                      <p>{mes.date}</p>
+                      <p>{mes.time}</p>
+                    </div>
+                    <img src={`http://localhost:8000/images/${mes.dp}`}></img>
+                  </div>
+                )}
+                {mes.user_id !== pId && (
+                  <div className="recieved">
+                    <img src={`http://localhost:8000/images/${mes.dp}`}></img>
+                    <div className="message">
+                      {mes.files && (
+                        <img
+                          src={`http://localhost:8000/images/${mes.files}`}
+                        ></img>
+                      )}
+                      <h6> {mes.message_text}</h6>
+                      <p>{mes.date}</p>
+                      <p>{mes.time}</p>
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-            {mes.user_id !== pId && (
-              <div className="recieved">
-                <img src={`http://localhost:8000/images/${mes.dp}`}></img>
-                <div className="message">
-                  {mes.files && (
-                    <img
-                      src={`http://localhost:8000/images/${mes.files}`}
-                    ></img>
-                  )}
-                  <h6> {mes.message_text}</h6>
-                  <p>{mes.date}</p>
-                  <p>{mes.time}</p>
-                </div>
-              </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
-      <div className="inputbox">
-        <label for="file-upload" class="file-upload-label">
-          <i class="fas fa-cloud-upload-alt"></i>
-          <FaPaperclip />
-        </label>
-        <input
-          // value={file}
-          id="file-upload"
-          type="file"
-          onChange={(e) => setFile(e.target.files[0])}
-        ></input>
-        <input
-          value={enteredMessage}
-          type="text"
-          placeholder="type message..."
-          className="inpmsg border rounded-3"
-          onChange={(e) => setEnteredMessage(e.target.value)}
-        ></input>
-        <button className="border rounded-3 p-1" onClick={sendMessage}>
-          <IoIosSend />
-        </button>
-      </div>
+          <div className="inputbox">
+            <label for="file-upload" class="file-upload-label">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <FaPaperclip />
+            </label>
+            <input
+              // value={file}
+              id="file-upload"
+              type="file"
+              onChange={(e) => setFile(e.target.files[0])}
+            ></input>
+            <input
+              value={enteredMessage}
+              type="text"
+              placeholder="type message..."
+              className="inpmsg border rounded-3"
+              onChange={(e) => setEnteredMessage(e.target.value)}
+            ></input>
+            <button className="border rounded-3 p-1" onClick={sendMessage}>
+              <IoIosSend />
+            </button>
+          </div>
+        </div>
+      )}
+      {edit && (
+        <div className="d-flex justify-content-center align-items-center vh-100">
+          <div className="inneredit">
+            <input
+              type="text"
+              placeholder="search people"
+              onChange={searchTog}
+            ></input>
+            {!searchToggle && <div>members</div>}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
