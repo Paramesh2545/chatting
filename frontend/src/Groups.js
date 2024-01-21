@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Component } from "react";
 import { useContext } from "react";
 import { ThemeContext } from "./ThemeContext";
 import { useEffect } from "react";
@@ -17,10 +17,34 @@ function Groups(props) {
   const [grpMessages, setGrpMessages] = useState([]);
   const [file, setFile] = useState(null);
   const [enteredMessage, setEnteredMessage] = useState("");
-  const [edit, setEdit] = useState(true);
+  const [edit, setEdit] = useState(false);
   const [search, setSearch] = useState("");
   const [searchToggle, setSearchToggle] = useState(false);
+
+  const [searchRes, setSearchRes] = useState([]);
+  const [adminId, setAdminId] = useState([]);
+  const [adminNames, setAdminNames] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [userNames, setUserNames] = useState([]);
+
+  const [members, setMembers] = useState([]);
+
   useEffect(() => {
+    console.log(grpId);
+    const getMembers = async () => {
+      try {
+        console.log("came to get members");
+        const res = await axios.post("http://localhost:8000/getMembers", {
+          grpId: grpId,
+        });
+        setMembers(res.data);
+
+        console.log(res.data, "from get members");
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
     const getGroup = async () => {
       try {
         const res = await axios.post("http://localhost:8000/getGroups", {
@@ -33,10 +57,10 @@ function Groups(props) {
         console.log(err);
       }
     };
-
+    getMembers();
     getMes(grpId);
     getGroup(grpId);
-  }, [grpId]);
+  }, []);
   const getMes = async (grpId) => {
     try {
       console.log("came to get messages");
@@ -103,10 +127,20 @@ function Groups(props) {
     getMes(grpId);
   };
 
-  const searchTog = (e) => {
+  const searchTog = async (e) => {
     setSearch(e.target.value);
     if (search.length > 1) {
       setSearchToggle(true);
+      try {
+        const res = await axios.post("http://localhost:8000/searchUsers", {
+          search: search,
+          cur_id: pId,
+        });
+        console.log(res.data);
+        setSearchRes(res.data);
+      } catch (err) {
+        console.log(err);
+      }
     } else {
       setSearchToggle(false);
     }
@@ -123,6 +157,25 @@ function Groups(props) {
     getMes(pId);
   };
 
+  const editChey = () => {
+    setEdit(!edit);
+  };
+
+  const addUser = async (id, name, grpName) => {
+    setUsers((prev) => [...prev, id]);
+    console.log(users, "this is users from add user");
+    try {
+      const res = await axios.post("http://localhost:8000/addusers", {
+        grpId: grpId,
+        grpName: grpName,
+        id: id,
+        name: name,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="mainGroups">
       <div className="upnavbar">
@@ -134,7 +187,10 @@ function Groups(props) {
             </div>
             <div className="upRight">
               {grp.member_pos === "ADMIN" && (
-                <MdOutlineManageAccounts className="manageIcon" />
+                <MdOutlineManageAccounts
+                  className="manageIcon"
+                  onClick={editChey}
+                />
               )}
             </div>
           </div>
@@ -213,7 +269,48 @@ function Groups(props) {
               placeholder="search people"
               onChange={searchTog}
             ></input>
-            {!searchToggle && <div>members</div>}
+            {searchToggle && (
+              <div>
+                {searchRes.map((sea) => (
+                  <div>
+                    {sea.use_id !== pId && !users.includes(sea.user_id) && (
+                      <div className="d-flex m-1">
+                        <p>{sea.user_name}</p>
+                        <button
+                          onClick={() =>
+                            addUser(sea.user_id, sea.user_name, sea.club_name)
+                          }
+                        >
+                          Add to Group
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            {!searchToggle && (
+              <div>
+                members
+                {members.map((mem) => (
+                  <div className="d-flex">
+                    {mem.Status != "PENDING" && (
+                      <div className="d-flex">
+                        <img
+                          src={`http://localhost:8000/images/${mem.dp}`}
+                        ></img>
+                        <p>{mem.member_name}</p>
+                        <button className="bg-danger">remove</button>
+
+                        {mem.member_pos === "ADMIN" && (
+                          <button className="bg-danger">depromote</button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

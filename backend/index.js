@@ -618,6 +618,28 @@ app.post("/creategroup", upload.single("file"), (req, res) => {
   });
 });
 
+app.post("/addusers", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const grpId = req.body.grpId;
+    const grpName = req.body.grpName;
+    const id = req.body.id;
+    const name = req.body.Name;
+    const sql = `insert into club_members values(?,?,?,?,"USER","PENDING")`;
+    connection.query(sql, [grpId, grpName, id, name], (err, data) => {
+      connection.release();
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      return res.status(200).json("ok");
+    });
+  });
+});
+
 app.post("/addgroupmembers", (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) {
@@ -851,6 +873,25 @@ app.post("/getGroupMes", (req, res) => {
         return res.status(500).json(err);
       }
       console.log(data, "came to groups message");
+      return res.status(200).json(data);
+    });
+  });
+});
+
+app.post("/getMembers", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const grpId = req.body.grpId;
+    const sql = `select distinct * from club_members join users on users.user_id=club_members.memberId  where club_id=?`;
+    connection.query(sql, [grpId], (err, data) => {
+      connection.release();
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
       return res.status(200).json(data);
     });
   });
