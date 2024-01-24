@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import { FaBell, FaLifeRing } from "react-icons/fa";
-import { CiLight } from "react-icons/ci";
+import { CiLight, CiLineHeight } from "react-icons/ci";
 import { CiDark } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
 import "./style.css";
@@ -10,6 +10,7 @@ import axios from "axios";
 // import { useTheme } from "./ThemeContext";
 import CreateGroups from "./CreateGroups";
 import { useNavigate } from "react-router-dom";
+import { FaChessKing } from "react-icons/fa6";
 
 function Side(props) {
   const [dark, setDark] = useState(false);
@@ -156,6 +157,8 @@ function Side(props) {
       },
     ]);
     setGrpId(grpId);
+    console.log("from side js", grpId);
+    SetSelected(grpName);
   };
   const clubs = async (cur_id) => {
     console.log("came to clubs da");
@@ -229,7 +232,9 @@ function Side(props) {
           <h3>GROUPS</h3>
           <ul>
             {groups.map((grp) => (
-              <div>
+              <div
+                className={selected === grp.group_name ? "highlight" : "normal"}
+              >
                 {(grp.Status === "ACCEPTED" || grp.Status === "CREATOR") && (
                   <li
                     className="groups"

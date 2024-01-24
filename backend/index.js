@@ -96,21 +96,21 @@ app.post("/side", (req, res) => {
       connection.release();
       if (err) {
         console.log(err);
-        res.status(500).json({ err: "error in inserting the data" });
+        return res.status(500).json({ err: "error in inserting the data" });
       } else if (data.length > 0) {
         // console.log("inserted successfuly");
         // res.status(200).json("sended request");
         console.log("already inserted");
-        res.status(200).json("already inserted ra");
+        return res.status(200).json("already inserted ra");
       } else {
         connection.query(sql, (err, data) => {
           connection.release();
           if (err) {
             console.log(err);
-            res.status(500).json({ err: "error in inserting the data" });
+            return res.status(500).json({ err: "error in inserting the data" });
           } else {
             console.log("inserted successfuly");
-            res.status(200).json("sended request");
+            return res.status(200).json("sended request");
           }
         });
       }
@@ -131,10 +131,10 @@ app.post("/getdp", (req, res) => {
     connection.query(sql, (err, data) => {
       connection.release();
       if (err) {
-        res.status(500).json({ err: "error in getting the dp" });
+        return res.status(500).json({ err: "error in getting the dp" });
       } else {
         console.log(data);
-        res.status(200).json(data[0]);
+        return res.status(200).json(data[0]);
       }
     });
   });
@@ -182,7 +182,7 @@ app.post("/usersdata", (req, res) => {
       connection.release();
       if (err) {
         console.log("hi");
-        res.status(500).json({ err: "error in fetching the data" });
+        return res.status(500).json({ err: "error in fetching the data" });
       } else {
         console.log(data);
         return res.status(200).json(data[0]);
@@ -242,7 +242,7 @@ app.post("/signup", upload.single("file"), (req, res) => {
     connection.query(sql[0], [username, email, password, file], (err, data) => {
       connection.release();
       if (err) {
-        res.status(500).json({ err: "error in inserting the data" });
+        return res.status(500).json({ err: "error in inserting the data" });
       } else {
         console.log("inserted successfully");
         let createQueries = sql.slice(1);
@@ -253,15 +253,14 @@ app.post("/signup", upload.single("file"), (req, res) => {
     function createTables(queries, res) {
       if (queries.length === 0) {
         console.log("All tables created successfully");
-        res.status(200).json("User registered successfully");
-        return;
+        return res.status(200).json("User registered successfully");
       }
       const query = queries.shift(); // Get the first query from the array
       connection.query(query, (err, tableData) => {
         connection.release();
         if (err) {
           console.error("Error creating table:", err);
-          res.status(500).json({ err: "Error in creating table" });
+          return res.status(500).json({ err: "Error in creating table" });
         } else {
           console.log("Table created successfully:", query);
           createTables(queries, res); // Recursively call to create next table
@@ -300,7 +299,7 @@ app.post("/getGroupRequests", (req, res) => {
       return res.status(500).json(err);
     }
     const toId = req.body.presentUserId;
-    const sql = `select * from grouprequests inner join clubs on grouprequests.groupId=clubs.groupId inner join club_members on club_members.club_id=clubs.groupId and memberId=? where grouprequests.toId=?`;
+    const sql = `select distinct * from grouprequests inner join clubs on grouprequests.groupId=clubs.groupId inner join club_members on club_members.club_id=clubs.groupId and memberId=? where grouprequests.toId=?`;
     connection.query(sql, [toId, toId], (err, data) => {
       if (err) {
         console.log(err);
@@ -335,17 +334,17 @@ app.post("/accept", (req, res) => {
           connection.release();
           if (err) {
             console.log(err);
-            res.status(500).json(err);
+            return res.status(500).json(err);
           }
           console.log("success in adding to friend list");
           connection.query(secondsql, (err, data) => {
             connection.release();
             if (err) {
               console.log(err);
-              res.status(500).json(err);
+              return res.status(500).json(err);
             }
             console.log("inserted into friendship table");
-            res.status(200).json("success full added to friends list");
+            return res.status(200).json("success full added to friends list");
           });
         });
       }
@@ -358,7 +357,7 @@ app.post("/getFriends", (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) {
       console.log(err);
-      res.status(500).json(err);
+      return res.status(500).json(err);
     }
     const cur_id = req.body.cur_id;
     const sql = `select distinct 
@@ -370,10 +369,10 @@ app.post("/getFriends", (req, res) => {
       connection.release();
       if (err) {
         console.log(err);
-        res.status(500).json(err);
+        return res.status(500).json(err);
       }
       // console.log(data);
-      res.status(200).json(data);
+      return res.status(200).json(data);
     });
   });
 });
@@ -382,7 +381,7 @@ app.post("/getmessages", (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) {
       console.log(err);
-      res.status(500).json(err);
+      return res.status(500).json(err);
     }
     const pId = req.body.pId;
     const friend = req.body.friend;
@@ -404,7 +403,7 @@ app.post("/sendFile", upload.single("file"), (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) {
       console.log(err);
-      res.status(500).json("error in connection to data");
+      return res.status(500).json("error in connection to data");
     }
     const { pid, friend } = req.body;
     // if (FormData.has("file")) {
@@ -428,7 +427,7 @@ app.post("/sendFileGrp", upload.single("file"), (req, res) => {
   pool.getConnection((err, connection) => {
     if (err) {
       console.log(err);
-      res.status(500).json("error in connection to data");
+      return res.status(500).json("error in connection to data");
     }
     const { pId, grpId } = req.body;
     // if (FormData.has("file")) {
@@ -462,10 +461,10 @@ app.post("/sendmessage", (req, res) => {
       connection.release();
       if (err) {
         console.log(err);
-        res.status(500).json(err);
+        return res.status(500).json(err);
       }
       console.log("inserted the message");
-      res.status(200).json(data);
+      return res.status(200).json(data);
     });
   });
 });
@@ -484,10 +483,10 @@ app.post("/sendGrpMessage", (req, res) => {
       connection.release();
       if (err) {
         console.log(err);
-        res.status(500).json(err);
+        return res.status(500).json(err);
       }
       console.log("inserted the message");
-      res.status(200).json(data);
+      return res.status(200).json(data);
     });
   });
 });
@@ -504,9 +503,9 @@ app.post("/getDetails", (req, res) => {
       connection.release();
       if (err) {
         console.log(err);
-        res.status(500).json(err);
+        return res.status(500).json(err);
       }
-      res.status(200).json(data[0]);
+      return res.status(200).json(data[0]);
     });
   });
 });
@@ -525,10 +524,10 @@ app.post("/getClubs", (req, res) => {
       // console.log("came to clubs");
       if (err) {
         console.log(err);
-        res.status(500).json(err);
+        return res.status(500).json(err);
       }
       // console.log(data, "this clubs da");
-      res.status(200).json(data);
+      return res.status(200).json(data);
     });
   });
 });
@@ -582,8 +581,14 @@ app.post("/searchUsers", (req, res) => {
       return res.status(400).json({ error: "search term too short" });
     }
     const cur_id = req.body.cur_id;
-    const sql = `select * from users where user_name like '%${search}%' and user_id!='${cur_id}'`;
-    connection.query(sql, (err, data) => {
+    const grpId = req.body.grpId;
+    const sql = `SELECT u.*
+    FROM users u
+    LEFT JOIN grouprequests g
+      ON u.user_id = g.ToId AND g.groupId =?
+    WHERE g.ToId IS NULL
+     AND u.user_id!=?;`;
+    connection.query(sql, [grpId, cur_id], (err, data) => {
       connection.release();
       if (err) {
         console.log(err);
@@ -761,7 +766,7 @@ app.post("/addgroupmembers", (req, res) => {
         );
       }
       console.log("ok");
-      res.status(200).json("ok");
+      return res.status(200).json("ok");
       // connection.query(
       //   secondsql,
       //   [admin.map((admin) => [admin])],
@@ -850,7 +855,7 @@ app.post("/getGroups", (req, res) => {
         console.log(err);
         return res.status(500).json(err);
       }
-      console.log(data);
+      console.log(data, "i am from get clubs");
       return res.status(200).json(data);
     });
   });
@@ -893,6 +898,64 @@ app.post("/getMembers", (req, res) => {
         return res.status(500).json(err);
       }
       return res.status(200).json(data);
+    });
+  });
+});
+
+app.post("/removeUser", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const id = req.body.id;
+    const grpId = req.body.grpId;
+    const sql = `delete from club_members where club_id=? and memberId=?`;
+    connection.query(sql, [grpId, id], (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      return res.status(200).json("ok");
+    });
+  });
+});
+app.post("/depromoteUser", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const id = req.body.id;
+    const grpId = req.body.grpId;
+    const sql = `update club_members 
+   set member_pos="USER" where club_id=? and memberid=?`;
+    connection.query(sql, [grpId, id], (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      return res.status(200).json("ok");
+    });
+  });
+});
+
+app.post("/promoteUser", (req, res) => {
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json(err);
+    }
+    const id = req.body.id;
+    const grpId = req.body.grpId;
+    const sql = `update club_members 
+   set member_pos="ADMIN" where club_id=? and memberid=?`;
+    connection.query(sql, [grpId, id], (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json(err);
+      }
+      return res.status(200).json("ok");
     });
   });
 });

@@ -9,9 +9,11 @@ import "./App.css";
 import { FaPaperclip } from "react-icons/fa6";
 import { IoIosSend } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
+import { CiLight } from "react-icons/ci";
 
 function Groups(props) {
   const { grpId } = useContext(ThemeContext);
+  console.log(grpId, "from the groups");
   const pId = props.id;
   const [groupDetails, setGroupDetails] = useState([]);
   const [grpMessages, setGrpMessages] = useState([]);
@@ -31,36 +33,36 @@ function Groups(props) {
 
   useEffect(() => {
     console.log(grpId);
-    const getMembers = async () => {
-      try {
-        console.log("came to get members");
-        const res = await axios.post("http://localhost:8000/getMembers", {
-          grpId: grpId,
-        });
-        setMembers(res.data);
-
-        console.log(res.data, "from get members");
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    const getGroup = async () => {
-      try {
-        const res = await axios.post("http://localhost:8000/getGroups", {
-          grpId: grpId,
-          pId: pId,
-        });
-        setGroupDetails(res.data);
-        console.log(res);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    getMembers();
-    getMes(grpId);
     getGroup(grpId);
-  }, []);
+    getMes(grpId);
+    getMembers(grpId);
+  }, [grpId]);
+  const getGroup = async (grpId) => {
+    try {
+      console.log("calling get group");
+      const res = await axios.post("http://localhost:8000/getGroups", {
+        grpId: grpId,
+        pId: pId,
+      });
+      setGroupDetails(res.data);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const getMembers = async (grpId) => {
+    try {
+      console.log("came to get members");
+      const res = await axios.post("http://localhost:8000/getMembers", {
+        grpId: grpId,
+      });
+      setMembers(res.data);
+
+      console.log(res.data, "from get members");
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const getMes = async (grpId) => {
     try {
       console.log("came to get messages");
@@ -135,6 +137,7 @@ function Groups(props) {
         const res = await axios.post("http://localhost:8000/searchUsers", {
           search: search,
           cur_id: pId,
+          grpId: grpId,
         });
         console.log(res.data);
         setSearchRes(res.data);
@@ -175,7 +178,44 @@ function Groups(props) {
       console.log(err);
     }
   };
+  const removeUser = async (id) => {
+    try {
+      console.log("came to remove user");
+      const res = await axios.post("http://localhost:8000/removeUser", {
+        id: id,
+        grpId: grpId,
+      });
+      getMembers();
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
+  const depromote = async (id) => {
+    try {
+      console.log("came to depromote user");
+      const res = await axios.post("http://localhost:8000/depromoteUser", {
+        id: id,
+        grpId: grpId,
+      });
+      getMembers();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const promote = async (id) => {
+    try {
+      console.log("came to promote user");
+      const res = await axios.post("http://localhost:8000/promoteUser", {
+        id: id,
+        grpId: grpId,
+      });
+      getMembers();
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <div className="mainGroups">
       <div className="upnavbar">
@@ -295,15 +335,33 @@ function Groups(props) {
                 {members.map((mem) => (
                   <div className="d-flex">
                     {mem.Status != "PENDING" && (
-                      <div className="d-flex">
+                      <div className="d-flex m-1">
                         <img
                           src={`http://localhost:8000/images/${mem.dp}`}
                         ></img>
                         <p>{mem.member_name}</p>
-                        <button className="bg-danger">remove</button>
+                        <button
+                          className="bg-danger"
+                          onClick={() => removeUser(mem.memberId)}
+                        >
+                          remove
+                        </button>
 
                         {mem.member_pos === "ADMIN" && (
-                          <button className="bg-danger">depromote</button>
+                          <button
+                            className="bg-danger"
+                            onClick={() => depromote(mem.memberId)}
+                          >
+                            depromote
+                          </button>
+                        )}
+                        {mem.member_pos === "USER" && (
+                          <button
+                            className="bg-success"
+                            onClick={() => promote(mem.memberId)}
+                          >
+                            promote
+                          </button>
                         )}
                       </div>
                     )}
