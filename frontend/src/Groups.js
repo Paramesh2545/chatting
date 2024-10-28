@@ -197,6 +197,7 @@ function Groups(props) {
       const res = await axios.post("http://localhost:8000/depromoteUser", {
         id: id,
         grpId: grpId,
+
       });
       getMembers();
     } catch (err) {
@@ -230,6 +231,7 @@ function Groups(props) {
                 <MdOutlineManageAccounts
                   className="manageIcon"
                   onClick={editChey}
+
                 />
               )}
             </div>
@@ -245,6 +247,7 @@ function Groups(props) {
                   <div className="sended">
                     <div className="del" onClick={() => delMessage(mes.msgId)}>
                       <MdDelete />
+
                     </div>
                     <div className="message">
                       {mes.files && (
@@ -254,6 +257,7 @@ function Groups(props) {
                       )}
                       <h6> {mes.message_text}</h6>
                       <p>{mes.date}</p>
+
                       <p>{mes.time}</p>
                     </div>
                     <img src={`http://localhost:8000/images/${mes.dp}`}></img>
@@ -266,6 +270,7 @@ function Groups(props) {
                       {mes.files && (
                         <img
                           src={`http://localhost:8000/images/${mes.files}`}
+
                         ></img>
                       )}
                       <h6> {mes.message_text}</h6>
@@ -281,12 +286,14 @@ function Groups(props) {
             <label for="file-upload" class="file-upload-label">
               <i class="fas fa-cloud-upload-alt"></i>
               <FaPaperclip />
+
             </label>
             <input
               // value={file}
               id="file-upload"
               type="file"
               onChange={(e) => setFile(e.target.files[0])}
+              
             ></input>
             <input
               value={enteredMessage}

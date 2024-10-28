@@ -286,3 +286,34 @@ function Side(props) {
 }
 
 export default Side;
+
+// function sideGroups({ grp, selected, groupChats, creg }) {
+//   return (
+//     <div>
+//       <h3>GROUPS</h3>
+//       <ul>
+//         {groups.map((grp) => (
+//           <div className={selected === grp.group_name ? "highlight" : "normal"}>
+//             {(grp.Status === "ACCEPTED" || grp.Status === "CREATOR") && (
+//               <li
+//                 className="groups"
+//                 onClick={() =>
+//                   groupChats(grp.groupId, grp.group_name, grp.group_dp)
+//                 }
+//               >
+//                 <img
+//                   src={`http://localhost:8000/images/${grp.group_dp}`}
+//                   className="groupDp"
+//                 ></img>
+//                 <p>{grp.club_name}</p>
+//               </li>
+//             )}
+//           </div>
+//         ))}
+//       </ul>
+//       <button className="addbtn" onClick={creg}>
+//         +
+//       </button>
+//     </div>
+//   );
+// }

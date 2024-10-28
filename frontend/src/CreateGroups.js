@@ -251,6 +251,7 @@ function CreateGroups() {
                     {sea.user_id !== cur_id && (
                       <div className="d-flex">
                         <p>{sea.user_name}</p>
+                        
                         {/* <button
                       className="mx-2 rounded-3 mb-2 addBTN"
                       onClick={() => add(sea.user_id)}
